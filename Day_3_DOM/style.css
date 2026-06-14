@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+}
+
+main {
+    height: 300px;
+    width: 500px;
+    background-color: rgb(109, 109, 109);
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-evenly
+}
+
+.box {
+    height: 30px;
+    width: 100px;
+    background-color: red;
+}
