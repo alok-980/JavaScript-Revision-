@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskFlow – DOM Mastery Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ─── CSS VARIABLES ─── */
+        :root[data-theme="dark"] {
+            --bg: #0F1729;
+            --surface: #1E2D4A;
+            --surface2: #243558;
+            --border: #2E4070;
+            --text: #E2E8F0;
+            --text-muted: #7D93B5;
+            --primary: #6C63FF;
+            --primary-glow: #6C63FF44;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #FF6B6B;
+            --info: #38BDF8;
+            --card-shadow: 0 4px 24px #00000055;
+        }
+
+        :root[data-theme="light"] {
+            --bg: #F0F4FF;
+            --surface: #FFFFFF;
+            --surface2: #E8EEF8;
+            --border: #CBD5E1;
+            --text: #1E293B;
+            --text-muted: #64748B;
+            --primary: #6C63FF;
+            --primary-glow: #6C63FF22;
+            --success: #059669;
+            --warning: #D97706;
+            --danger: #EF4444;
+            --info: #0284C7;
+            --card-shadow: 0 4px 24px #0000001A;
+        }
+
+        /* ─── RESET ─── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.6;
+        }
+
+        code,
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ─── LAYOUT ─── */
+        .app-shell {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-logo span {
+            color: var(--text);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.15s;
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary-glow);
+            color: var(--primary);
+        }
+
+        .nav-item .icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+
+        .sidebar-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 0 14px;
+            margin-top: 4px;
+        }
+
+        /* ─── MAIN ─── */
+        .main {
+            padding: 40px 48px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* ─── HEADER ROW ─── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .page-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ─── THEME TOGGLE ─── */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .toggle-pill {
+            width: 36px;
+            height: 20px;
+            background: var(--border);
+            border-radius: 20px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        [data-theme="dark"] .toggle-pill {
+            background: var(--primary);
+        }
+
+        .toggle-pill::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+        }
+
+        [data-theme="dark"] .toggle-pill::after {
+            transform: translateX(16px);
+        }
+
+        /* ─── STATS ROW ─── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card.total .stat-value {
+            color: var(--primary);
+        }
+
+        .stat-card.done .stat-value {
+            color: var(--success);
+        }
+
+        .stat-card.pending .stat-value {
+            color: var(--warning);
+        }
+
+        .stat-card.cats .stat-value {
+            color: var(--info);
+        }
+
+        /* ─── FORM ─── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: var(--text);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 180px auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field input,
+        .field select {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--primary);
+        }
+
+        .field input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .field select option {
+            background: var(--surface);
+        }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: transparent;
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            border-radius: 6px;
+        }
+
+        /* ─── SEARCH + FILTER ─── */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 14px 9px 38px;
+            color: var(--text);
+            font-size: 0.88rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-wrap::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+        }
+
+        .filter-select {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 14px;
+            color: var(--text);
+            font-size: 0.88rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* ─── TASK CARDS ─── */
+        #tasks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s;
+            animation: slideIn 0.2s ease;
+            box-shadow: var(--card-shadow);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+        }
+
+        .task-card.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.15s;
+        }
+
+        .task-card.completed .task-check {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+            font-size: 10px;
+        }
+
+        .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-work {
+            background: #6C63FF22;
+            color: var(--primary);
+        }
+
+        .tag-personal {
+            background: #10B98122;
+            color: var(--success);
+        }
+
+        .tag-study {
+            background: #38BDF822;
+            color: var(--info);
+        }
+
+        .tag-health {
+            background: #FF6B6B22;
+            color: var(--danger);
+        }
+
+        .tag-other {
+            background: #F59E0B22;
+            color: var(--warning);
+        }
+
+        .task-id {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        /* ─── EDIT MODE ─── */
+        .task-edit-input {
+            background: var(--bg);
+            border: 1.5px solid var(--primary);
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            width: 100%;
+        }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .big {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* ─── PROPAGATION DEMO ─── */
+        .prop-demo {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .prop-demo h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .prop-demo p {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .prop-box {
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .grandparent {
+            background: #6C63FF22;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .parent {
+            background: #10B98122;
+            border: 2px solid var(--success);
+            color: var(--success);
+            margin: 14px;
+        }
+
+        .child-btn {
+            background: var(--warning);
+            border: none;
+            color: #000;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .grandparent:hover {
+            background: #6C63FF33;
+        }
+
+        .parent:hover {
+            background: #10B98133;
+        }
+
+        .prop-log {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            min-height: 80px;
+            max-height: 160px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .log-entry {
+            padding: 2px 0;
+        }
+
+        .log-bubble {
+            color: #F59E0B;
+        }
+
+        .log-capture {
+            color: #38BDF8;
+        }
+
+        /* ─── ATTR vs PROP DEMO ─── */
+        .demo-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .demo-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .demo-card p {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .demo-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .demo-box h4 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .demo-output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--info);
+            background: var(--surface);
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        /* ─── BROWSER PIPELINE ─── */
+        .pipeline-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .pipeline-section h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .pipeline-section p.sub {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .pipeline-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+
+        .pipeline-col-wrap {
+            display: grid;
+            grid-template-columns: 1fr 24px 1fr;
+            gap: 0;
+            align-items: start;
+            margin-bottom: 0;
+        }
+
+        .pipeline-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pipe-step {
+            border-radius: 10px;
+            padding: 14px 20px;
+            text-align: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .pipe-step .step-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .pipe-step .step-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .step-html {
+            background: #6C63FF22;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .step-parse {
+            background: #38BDF822;
+            border: 1.5px solid var(--info);
+            color: var(--info);
+        }
+
+        .step-token {
+            background: #F59E0B22;
+            border: 1.5px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .step-dom {
+            background: #10B98122;
+            border: 1.5px solid var(--success);
+            color: var(--success);
+        }
+
+        .step-css {
+            background: #FF6B6B22;
+            border: 1.5px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .step-cssom {
+            background: #F59E0B22;
+            border: 1.5px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .step-render {
+            background: linear-gradient(135deg, #6C63FF33, #10B98133);
+            border: 1.5px solid var(--primary);
+            color: var(--text);
+        }
+
+        .step-render .step-name {
+            color: var(--primary);
+        }
+
+        .pipe-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .pipe-merge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            grid-column: 1 / 4;
+        }
+
+        .merge-node {
+            background: var(--surface2);
+            border: 1.5px dashed var(--border);
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-align: center;
+            grid-column: 1 / 4;
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        /* ─── INFO CARDS ─── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .info-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .info-card h4 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ─── TOAST ─── */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: var(--card-shadow);
+            animation: toastIn 0.25s ease, toastOut 0.25s ease 2.5s forwards;
+            min-width: 220px;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.danger {
+            border-left-color: var(--danger);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* ─── UTILITY ─── */
+        .mt-16 {
+            margin-top: 16px;
+        }
+
+        .mt-24 {
+            margin-top: 24px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chip-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .chip {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            color: var(--text-muted);
+            background: transparent;
+            transition: all 0.15s;
+        }
+
+        .chip.active,
+        .chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                padding: 24px 20px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- ─── SIDEBAR ─── -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">⚡ <span>Task<b style="color:var(--primary)">Flow</b></span></div>
+
+            <span class="sidebar-label">Main</span>
+            <button class="nav-item active" onclick="showSection('tasks')">
+                <span class="icon">✅</span> Task Manager
+            </button>
+            <button class="nav-item" onclick="showSection('attr')">
+                <span class="icon">🏷️</span> Attributes vs Props
+            </button>
+
+            <div class="sidebar-divider"></div>
+            <span class="sidebar-label">Deep Dive</span>
+            <button class="nav-item" onclick="showSection('events')">
+                <span class="icon">⚡</span> Event Propagation
+            </button>
+            <button class="nav-item" onclick="showSection('pipeline')">
+                <span class="icon">🧠</span> Browser Pipeline
+            </button>
+
+            <div class="sidebar-divider" style="margin-top:auto"></div>
+            <button class="nav-item" onclick="clearAllTasks()">
+                <span class="icon">🗑️</span> Clear All Tasks
+            </button>
+        </aside>
+
+        <!-- ─── MAIN ─── -->
+        <main class="main">
+
+            <!-- HEADER -->
+            <div class="page-header">
+                <div>
+                    <div class="page-title" id="section-title">Task Manager</div>
+                    <div class="page-sub" id="section-sub">Manage, organise and track your tasks</div>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span id="theme-label">🌙 Dark</span>
+                    <div class="toggle-pill"></div>
+                </button>
+            </div>
+
+            <!-- ════════════════════════════════════
+         SECTION 1: TASK MANAGER
+    ════════════════════════════════════ -->
+            <div id="section-tasks" class="section active">
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card total">
+                        <div class="stat-label">Total</div>
+                        <div class="stat-value" id="stat-total">0</div>
+                    </div>
+                    <div class="stat-card done">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="stat-done">0</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-label">Pending</div>
+                        <div class="stat-value" id="stat-pending">0</div>
+                    </div>
+                    <div class="stat-card cats">
+                        <div class="stat-label">Categories</div>
+                        <div class="stat-value" id="stat-cats">0</div>
+                    </div>
+                </div>
+
+                <!-- Add Task Form -->
+                <div class="form-card">
+                    <div class="form-title">➕ Add New Task</div>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="task-input">Task Title</label>
+                            <input type="text" id="task-input" placeholder="What needs to be done?"
+                                value="Learn Event Delegation" />
+                        </div>
+                        <div class="field">
+                            <label for="cat-select">Category</label>
+                            <select id="cat-select">
+                                <option value="work">💼 Work</option>
+                                <option value="personal">🏠 Personal</option>
+                                <option value="study" selected>📚 Study</option>
+                                <option value="health">💪 Health</option>
+                                <option value="other">🔖 Other</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="addTask()">➕ Add Task</button>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <input type="text" id="search-input" placeholder="Search tasks…" oninput="filterTasks()" />
+                    </div>
+                    <select class="filter-select" id="filter-cat" onchange="filterTasks()">
+                        <option value="all">All Categories</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="study">Study</option>
+                        <option value="health">Health</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <select class="filter-select" id="filter-status" onchange="filterTasks()">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <!-- Task List (Event Delegation: single listener on container) -->
+                <div id="tasks-container">
+                    <div class="empty-state" id="empty-state">
+                        <div class="big">📭</div>
+                        <p>No tasks yet. Add your first task above!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ════════════════════════════════════
+         SECTION 2: ATTRIBUTES vs PROPERTIES
+    ════════════════════════════════════ -->
+            <div id="section-attr" class="section">
+
+                <div class="demo-card">
+                    <h3>🏷️ Attributes vs Properties — Live Demo</h3>
+                    <p>
+                        An <b>attribute</b> is defined in HTML and reflects the <em>initial/default</em> value.
+                        A <b>property</b> is the live DOM value that changes as the user interacts.
+                        They start equal but diverge once the user types.
+                    </p>
+
+                    <div class="field" style="max-width:400px">
+                        <label>Type something in the input below:</label>
+                        <input type="text" id="demo-input" value="Hello World" oninput="updateAttrDemo()"
+                            style="background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.9rem;font-family:'Inter',sans-serif;outline:none;margin-top:6px;" />
+                    </div>
+
+                    <div class="demo-grid mt-16">
+                        <div class="demo-box">
+                            <h4 style="color:var(--info)">Property — <code>input.value</code></h4>
+                            <p style="font-size:0.78rem;color:var(--text-muted)">
+                                This is the <em>live</em> DOM property. It reflects what the user currently has typed.
+                                Changes in real-time.
+                            </p>
+                            <div class="demo-output" id="prop-out">Hello World</div>
+                        </div>
+                        <div class="demo-box">
+                            <h4 style="color:var(--warning)">Attribute — <code>getAttribute("value")</code></h4>
+                            <p style="font-size:0.78rem;color:var(--text-muted)">
+                                This is the <em>HTML attribute</em>. It stays fixed to the initial HTML value
+                                unless you call <code>setAttribute()</code>.
+                            </p>
+                            <div class="demo-output" id="attr-out">Hello World</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-card">
+                    <h3>🔧 data-* Attribute Playground</h3>
+                    <p>Every task card stores its state using custom data attributes. Here you can inspect them live.
+                    </p>
+                    <div id="attr-task-list" style="display:flex;flex-direction:column;gap:10px;margin-top:8px;"></div>
+                </div>
+
+                <div class="demo-card">
+                    <h3>📋 Attribute API Methods</h3>
+                    <p>Demonstrations of all four attribute methods in the console (open DevTools to see).</p>
+                    <div class="chip-row">
+                        <button class="chip active" onclick="demoGetAttr()">getAttribute()</button>
+                        <button class="chip" onclick="demoSetAttr()">setAttribute()</button>
+                        <button class="chip" onclick="demoRemoveAttr()">removeAttribute()</button>
+                        <button class="chip" onclick="demoHasAttr()">hasAttribute()</button>
+                        <button class="chip" onclick="demoDataset()">dataset</button>
+                    </div>
+                    <div class="demo-output mt-16" id="attr-console" style="min-height:60px;">Click a method above to
+                        see output here…</div>
+                </div>
+            </div>
+
+            <!-- ════════════════════════════════════
+         SECTION 3: EVENT PROPAGATION
+    ════════════════════════════════════ -->
+            <div id="section-events" class="section">
+
+                <!-- BUBBLING -->
+                <div class="prop-demo">
+                    <h3>⬆️ Event Bubbling</h3>
+                    <p>
+                        Bubbling: events fire on the <strong>target</strong> first, then travel <em>up</em> to
+                        ancestors.
+                        Click the Child button — watch the order in the log.
+                        <br><code style="font-size:0.78rem;color:var(--info)">addEventListener(event, handler)</code> —
+                        default is bubbling (3rd arg = false)
+                    </p>
+
+                    <!--
+          EVENT BUBBLING STRUCTURE
+          Click propagates: Child → Parent → Grandparent
+          This is the default behaviour (useCapture = false)
+        -->
+                    <div class="prop-box grandparent" id="gp-bubble">
+                        Grandparent 👴
+                        <div class="prop-box parent" id="p-bubble">
+                            Parent 👨
+                            <br /><br />
+                            <button class="child-btn" id="child-bubble">Click Me (Child) 👶</button>
+                        </div>
+                    </div>
+
+                    <div class="prop-log" id="bubble-log">
+                        <span style="color:var(--text-muted);font-style:italic">Click the button to see bubbling…</span>
+                    </div>
+                    <div class="flex-between mt-16">
+                        <button class="btn btn-ghost btn-sm" onclick="clearLog('bubble-log')">Clear Log</button>
+                    </div>
+                </div>
+
+                <!-- CAPTURING -->
+                <div class="prop-demo">
+                    <h3>⬇️ Event Capturing</h3>
+                    <p>
+                        Capturing: events fire on <strong>outermost</strong> ancestor first, travel <em>down</em> to
+                        target.
+                        <br><code
+                            style="font-size:0.78rem;color:var(--info)">addEventListener(event, handler, <strong>true</strong>)</code>
+                        — 3rd arg = true enables capture
+                    </p>
+
+                    <!--
+          EVENT CAPTURING STRUCTURE
+          Click propagates: Grandparent → Parent → Child
+          useCapture = true passed to addEventListener
+        -->
+                    <div class="prop-box grandparent" id="gp-capture">
+                        Grandparent 👴
+                        <div class="prop-box parent" id="p-capture">
+                            Parent 👨
+                            <br /><br />
+                            <button class="child-btn" id="child-capture">Click Me (Child) 👶</button>
+                        </div>
+                    </div>
+
+                    <div class="prop-log" id="capture-log">
+                        <span style="color:var(--text-muted);font-style:italic">Click the button to see
+                            capturing…</span>
+                    </div>
+                    <div class="flex-between mt-16">
+                        <button class="btn btn-ghost btn-sm" onclick="clearLog('capture-log')">Clear Log</button>
+                    </div>
+                </div>
+
+                <!-- DELEGATION -->
+                <div class="prop-demo">
+                    <h3>🎯 Event Delegation — Live Example</h3>
+                    <p>
+                        One listener on the <strong>parent</strong> handles clicks on dynamically added children.
+                        <code style="font-size:0.78rem;color:var(--info)">event.target</code> identifies which element
+                        was clicked.
+                        This is exactly how the Task Manager above works!
+                    </p>
+                    <div id="delegation-demo" style="display:flex;flex-direction:column;gap:8px;">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="delegation-list">
+                            <button class="chip active" data-item="Apple">🍎 Apple</button>
+                            <button class="chip active" data-item="Banana">🍌 Banana</button>
+                            <button class="chip active" data-item="Cherry">🍒 Cherry</button>
+                        </div>
+                        <button class="btn btn-ghost btn-sm" style="width:fit-content" onclick="addDelegationItem()">+
+                            Add Fruit</button>
+                        <div class="prop-log" id="delegation-log">
+                            <span style="color:var(--text-muted);font-style:italic">Click any fruit to see delegation in
+                                action…</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ════════════════════════════════════
+         SECTION 4: BROWSER PIPELINE
+    ════════════════════════════════════ -->
+            <div id="section-pipeline" class="section">
+
+                <div class="pipeline-section">
+                    <h2>🧠 Browser Rendering Pipeline</h2>
+                    <p class="sub">How the browser transforms raw HTML + CSS into pixels on your screen</p>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+                        <!-- HTML side -->
+                        <div>
+                            <div
+                                style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">
+                                HTML Path</div>
+                            <div class="pipe-step step-html">
+                                <div class="step-name">📄 HTML Source</div>
+                                <div class="step-desc">Raw bytes downloaded from server</div>
+                            </div>
+                            <div class="pipe-arrow">↓</div>
+                            <div class="pipe-step step-parse">
+                                <div class="step-name">🔍 Parsing</div>
+                                <div class="step-desc">HTML Parser reads bytes sequentially</div>
+                            </div>
+                            <div class="pipe-arrow">↓</div>
+                            <div class="pipe-step step-token">
+                                <div class="step-name">🪙 Tokenization</div>
+                                <div class="step-desc">Tags converted to tokens: StartTag, EndTag, Text, Comment…</div>
+                            </div>
+                            <div class="pipe-arrow">↓</div>
+                            <div class="pipe-step step-dom">
+                                <div class="step-name">🌳 DOM Tree</div>
+                                <div class="step-desc">Tokens assembled into a tree of Node objects</div>
+                            </div>
+                        </div>
+
+                        <!-- CSS side -->
+                        <div>
+                            <div
+                                style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">
+                                CSS Path</div>
+                            <div class="pipe-step step-css">
+                                <div class="step-name">🎨 CSS Source</div>
+                                <div class="step-desc">Stylesheets, &lt;style&gt; tags, inline styles</div>
+                            </div>
+                            <div class="pipe-arrow">↓</div>
+                            <div class="pipe-step step-parse"
+                                style="border-color:var(--danger);color:var(--danger);background:#FF6B6B11;">
+                                <div class="step-name">🔍 CSS Parsing</div>
+                                <div class="step-desc">CSS Parser processes selectors and rules</div>
+                            </div>
+                            <div class="pipe-arrow">↓</div>
+                            <div class="pipe-step step-cssom">
+                                <div class="step-name">🗂️ CSSOM Tree</div>
+                                <div class="step-desc">CSS Object Model — mirrors DOM but for styles</div>
+                            </div>
+                            <div style="height:72px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Merge -->
+                    <div style="text-align:center;margin:16px 0;color:var(--text-muted);font-size:1.4rem;">↘
+                        &nbsp;&nbsp; ↙</div>
+                    <div
+                        style="background:var(--surface2);border:1.5px dashed var(--border);border-radius:8px;padding:10px;text-align:center;font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">
+                        DOM Tree + CSSOM Tree are combined
+                    </div>
+                    <div style="text-align:center;color:var(--text-muted);margin-bottom:8px;">↓</div>
+
+                    <div class="pipe-step step-render" style="max-width:360px;margin:0 auto;">
+                        <div class="step-name">✨ Render Tree</div>
+                        <div class="step-desc" style="color:var(--text-muted)">
+                            Only <em>visible</em> nodes with computed styles.<br />
+                            <code style="font-size:0.72rem">display:none</code> elements are excluded.
+                        </div>
+                    </div>
+                    <div style="text-align:center;color:var(--text-muted);margin:8px 0;">↓</div>
+                    <div class="pipe-step"
+                        style="max-width:360px;margin:0 auto;background:#38BDF822;border:1.5px solid var(--info);color:var(--info);">
+                        <div class="step-name">📐 Layout (Reflow)</div>
+                        <div class="step-desc" style="color:var(--text-muted)">Calculates exact position and size of
+                            every element</div>
+                    </div>
+                    <div style="text-align:center;color:var(--text-muted);margin:8px 0;">↓</div>
+                    <div class="pipe-step"
+                        style="max-width:360px;margin:0 auto;background:#10B98122;border:1.5px solid var(--success);color:var(--success);">
+                        <div class="step-name">🖌️ Paint</div>
+                        <div class="step-desc" style="color:var(--text-muted)">Fills in pixels — colors, borders,
+                            shadows, text</div>
+                    </div>
+                    <div style="text-align:center;color:var(--text-muted);margin:8px 0;">↓</div>
+                    <div class="pipe-step"
+                        style="max-width:360px;margin:0 auto;background:#6C63FF22;border:1.5px solid var(--primary);color:var(--primary);">
+                        <div class="step-name">🧩 Compositing</div>
+                        <div class="step-desc" style="color:var(--text-muted)">GPU combines layers and displays final
+                            output</div>
+                    </div>
+                </div>
+
+                <!-- Concept Cards -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--primary)"></div>Parsing
+                        </h4>
+                        <p>The HTML parser reads bytes sequentially and builds a tree. It is <em>error-tolerant</em> —
+                            malformed HTML is auto-corrected by the browser's parser.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--warning)"></div>Tokenization
+                        </h4>
+                        <p>The HTML is broken into tokens: <code>&lt;StartTag&gt;</code>, <code>&lt;EndTag&gt;</code>,
+                            <code>Text</code>, <code>Comment</code>, <code>DOCTYPE</code>. Each token maps to a node.
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--success)"></div>DOM Tree
+                        </h4>
+                        <p>A tree of <code>Node</code> objects (<code>Element</code>, <code>Text</code>,
+                            <code>Comment</code>…) that JavaScript can read and modify via DOM APIs.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--danger)"></div>CSSOM Tree
+                        </h4>
+                        <p>CSS rules are parsed into a tree structure with computed styles. Inheritance and specificity
+                            are resolved here before the Render Tree is built.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--info)"></div>Render Tree
+                        </h4>
+                        <p>Combines DOM + CSSOM. Only <em>visible</em> elements appear. <code>display:none</code> nodes
+                            are excluded; <code>visibility:hidden</code> nodes are still included.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--primary)"></div>Event Bubbling
+                        </h4>
+                        <p>Events fire on the target element first, then propagate <em>up</em> through ancestors to
+                            <code>document</code>. Default behaviour (useCapture = false).</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--warning)"></div>Event Capturing
+                        </h4>
+                        <p>Events fire on the <em>outermost</em> ancestor first and travel <em>down</em> to the target.
+                            Enabled by passing <code>true</code> as 3rd arg to <code>addEventListener</code>.</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>
+                            <div class="dot" style="background:var(--success)"></div>Event Delegation
+                        </h4>
+                        <p>Attach <strong>one listener on a parent</strong> to handle events from many children. Uses
+                            <code>event.target</code> to identify the source. Efficient — works for dynamic elements
+                            too.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        /* ════════════════════════════════════════════════════
+           STATE
+        ════════════════════════════════════════════════════ */
+        // Using DocumentFragment for bulk insertions where needed
+        let tasks = JSON.parse(localStorage.getItem('taskflow-tasks') || '[]');
+        let nextId = parseInt(localStorage.getItem('taskflow-nextid') || '1');
+
+        /* ════════════════════════════════════════════════════
+           NAVIGATION
+        ════════════════════════════════════════════════════ */
+        const sectionMeta = {
+            tasks: { title: 'Task Manager', sub: 'Manage, organise and track your tasks' },
+            attr: { title: 'Attributes vs Properties', sub: 'Understand the DOM attribute/property distinction' },
+            events: { title: 'Event Propagation', sub: 'Bubbling, Capturing and Delegation — visualised' },
+            pipeline: { title: 'Browser Pipeline', sub: 'From HTML bytes to pixels on screen' },
+        };
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => {
+                if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
+            });
+            const m = sectionMeta[id];
+            document.getElementById('section-title').textContent = m.title;
+            document.getElementById('section-sub').textContent = m.sub;
+
+            if (id === 'attr') renderAttrTaskList();
+        }
+
+        /* ════════════════════════════════════════════════════
+           THEME TOGGLE
+           Uses data-theme attribute on <html> and classList
+        ════════════════════════════════════════════════════ */
+        function toggleTheme() {
+            const html = document.documentElement;
+            // getAttribute / setAttribute usage for theme
+            const current = html.getAttribute('data-theme');   // getAttribute()
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);              // setAttribute()
+            document.getElementById('theme-label').textContent = next === 'dark' ? '🌙 Dark' : '☀️ Light';
+            // Also store in dataset
+            html.dataset.theme = next;                          // dataset
+            localStorage.setItem('taskflow-theme', next);
+        }
+
+        // Restore saved theme
+        (function () {
+            const saved = localStorage.getItem('taskflow-theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                document.documentElement.dataset.theme = saved;
+                if (document.getElementById('theme-label'))
+                    document.getElementById('theme-label').textContent = saved === 'dark' ? '🌙 Dark' : '☀️ Light';
+            }
+        })();
+
+        /* ════════════════════════════════════════════════════
+           TASK MANAGER
+           Uses createElement, createTextNode, append, prepend,
+           before, after, replaceWith, remove
+        ════════════════════════════════════════════════════ */
+        function addTask() {
+            const input = document.getElementById('task-input');
+            const catSel = document.getElementById('cat-select');
+            const title = input.value.trim();
+
+            if (!title) { showToast('Please enter a task title!', 'danger'); return; }
+
+            const task = {
+                id: nextId++,
+                title,
+                category: catSel.value,
+                status: 'pending',
+                createdAt: Date.now(),
+            };
+
+            // prepend so newest task appears at top
+            tasks.unshift(task);
+            saveTasks();
+
+            // Build card using createElement + createTextNode
+            const card = buildTaskCard(task);
+            const container = document.getElementById('tasks-container');
+
+            // Remove empty state if present
+            const empty = document.getElementById('empty-state');
+            if (empty) empty.remove();                      // remove()
+
+            container.prepend(card);                        // prepend()
+
+            updateStats();
+            input.value = '';
+            showToast('Task added! 🎉', 'success');
+        }
+
+        /* Build a task card using only DOM APIs */
+        function buildTaskCard(task) {
+            // createElement
+            const card = document.createElement('div');
+            card.className = 'task-card' + (task.status === 'completed' ? ' completed' : '');
+
+            // data-* attributes on card
+            card.setAttribute('data-id', task.id);        // setAttribute
+            card.setAttribute('data-status', task.status);    // setAttribute
+            card.setAttribute('data-category', task.category);  // setAttribute
+
+            // Check circle
+            const check = document.createElement('div');
+            check.className = 'task-check';
+            if (task.status === 'completed') {
+                // createTextNode
+                check.appendChild(document.createTextNode('✓'));
+            }
+
+            // Info
+            const info = document.createElement('div');
+            info.className = 'task-info';
+
+            const titleEl = document.createElement('div');
+            titleEl.className = 'task-title';
+            titleEl.appendChild(document.createTextNode(task.title));   // createTextNode
+
+            const meta = document.createElement('div');
+            meta.className = 'task-meta';
+
+            const tag = document.createElement('span');
+            tag.className = 'tag tag-' + task.category;
+            tag.appendChild(document.createTextNode(catEmoji(task.category) + ' ' + task.category));
+
+            const idBadge = document.createElement('span');
+            idBadge.className = 'task-id';
+            idBadge.appendChild(document.createTextNode('#' + task.id));
+
+            meta.append(tag, idBadge);                                  // append()
+            info.append(titleEl, meta);                                 // append()
+
+            // Actions
+            const actions = document.createElement('div');
+            actions.className = 'task-actions';
+
+            const btnEdit = makeBtn('✏️', 'btn btn-ghost btn-sm', 'edit', task.id);
+            const btnComplete = makeBtn(task.status === 'completed' ? '↩️' : '✅', 'btn btn-success btn-sm', 'complete', task.id);
+            const btnDelete = makeBtn('🗑️', 'btn btn-danger btn-sm', 'delete', task.id);
+
+            actions.append(btnEdit, btnComplete, btnDelete);            // append()
+            card.append(check, info, actions);                          // append()
+
+            return card;
+        }
+
+        function makeBtn(label, cls, action, id) {
+            const b = document.createElement('button');
+            b.className = cls;
+            b.setAttribute('data-action', action);                       // setAttribute
+            b.setAttribute('data-id', id);                          // setAttribute
+            b.appendChild(document.createTextNode(label));               // createTextNode
+            return b;
+        }
+
+        function catEmoji(cat) {
+            const m = { work: '💼', personal: '🏠', study: '📚', health: '💪', other: '🔖' };
+            return m[cat] || '🔖';
+        }
+
+        /* ─── EVENT DELEGATION ──────────────────────────────
+           Single listener on #tasks-container handles ALL task
+           actions (edit, complete, delete) via event.target.
+        ─────────────────────────────────────────────────── */
+        document.getElementById('tasks-container').addEventListener('click', function (e) {
+            // Walk up to find closest element with data-action
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+
+            const action = btn.getAttribute('data-action');   // getAttribute
+            const id = parseInt(btn.getAttribute('data-id'));  // getAttribute
+
+            if (action === 'delete') deleteTask(id);
+            if (action === 'complete') toggleComplete(id);
+            if (action === 'edit') startEdit(id, btn.closest('.task-card'));
+            if (action === 'save') saveEdit(id, btn.closest('.task-card'));
+            if (action === 'cancel') cancelEdit(id, btn.closest('.task-card'));
+        });
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (card) {
+                card.style.animation = 'none';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(20px)';
+                card.style.transition = 'all 0.2s';
+                setTimeout(() => card.remove(), 200);           // remove()
+            }
+
+            updateStats();
+            checkEmpty();
+            showToast('Task deleted 🗑️', 'danger');
+        }
+
+        function toggleComplete(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            task.status = task.status === 'completed' ? 'pending' : 'completed';
+            saveTasks();
+
+            const card = document.querySelector(`.task-card[data-id="${id}"]`);
+            if (card) {
+                card.setAttribute('data-status', task.status);  // setAttribute
+                card.classList.toggle('completed', task.status === 'completed');
+                // replaceWith: replace old card with fresh one
+                const fresh = buildTaskCard(task);
+                card.replaceWith(fresh);                        // replaceWith()
+            }
+            updateStats();
+            showToast(task.status === 'completed' ? 'Task completed! ✅' : 'Task reopened ↩️');
+        }
+
+        function startEdit(id, card) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            const titleEl = card.querySelector('.task-title');
+            const input = document.createElement('input');  // createElement
+            input.type = 'text';
+            input.value = task.title;
+            input.className = 'task-edit-input';
+
+            // Use before() / after() to insert around element
+            titleEl.replaceWith(input);                       // replaceWith()
+
+            const actions = card.querySelector('.task-actions');
+            const saveBtn = makeBtn('💾 Save', 'btn btn-success btn-sm', 'save', id);
+            const cancelBtn = makeBtn('✖ Cancel', 'btn btn-ghost btn-sm', 'cancel', id);
+
+            // Clear old buttons and append new ones
+            actions.innerHTML = '';
+            actions.append(saveBtn, cancelBtn);               // append()
+        }
+
+        function saveEdit(id, card) {
+            const input = card.querySelector('.task-edit-input');
+            const newTitle = input ? input.value.trim() : '';
+            if (!newTitle) { showToast('Title cannot be empty!', 'danger'); return; }
+
+            const task = tasks.find(t => t.id === id);
+            if (task) { task.title = newTitle; saveTasks(); }
+
+            const fresh = buildTaskCard(task);
+            card.replaceWith(fresh);                          // replaceWith()
+            showToast('Task updated ✏️');
+        }
+
+        function cancelEdit(id, card) {
+            const task = tasks.find(t => t.id === id);
+            if (task) card.replaceWith(buildTaskCard(task));  // replaceWith()
+        }
+
+        /* ─── SEARCH & FILTER ─────────────────────────────── */
+        function filterTasks() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const catF = document.getElementById('filter-cat').value;
+            const statF = document.getElementById('filter-status').value;
+
+            document.querySelectorAll('.task-card').forEach(card => {
+                const title = card.querySelector('.task-title')?.textContent.toLowerCase() || '';
+                const category = card.getAttribute('data-category');  // getAttribute
+                const status = card.getAttribute('data-status');    // getAttribute
+
+                const matchQ = title.includes(query);
+                const matchC = catF === 'all' || category === catF;
+                const matchS = statF === 'all' || status === statF;
+
+                card.style.display = (matchQ && matchC && matchS) ? 'flex' : 'none';
+            });
+        }
+
+        /* ─── STATS ───────────────────────────────────────── */
+        function updateStats() {
+            const total = tasks.length;
+            const done = tasks.filter(t => t.status === 'completed').length;
+            const cats = new Set(tasks.map(t => t.category)).size;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-done').textContent = done;
+            document.getElementById('stat-pending').textContent = total - done;
+            document.getElementById('stat-cats').textContent = cats;
+        }
+
+        function checkEmpty() {
+            const container = document.getElementById('tasks-container');
+            const cards = container.querySelectorAll('.task-card');
+            let empty = document.getElementById('empty-state');
+            if (cards.length === 0 && !empty) {
+                empty = document.createElement('div');
+                empty.id = 'empty-state';
+                empty.className = 'empty-state';
+                empty.innerHTML = '<div class="big">📭</div><p>No tasks yet. Add your first task above!</p>';
+                container.append(empty);                        // append()
+            }
+        }
+
+        function clearAllTasks() {
+            if (!tasks.length) { showToast('No tasks to clear!', 'danger'); return; }
+            if (!confirm('Clear ALL tasks? This cannot be undone.')) return;
+            tasks = [];
+            saveTasks();
+            renderAllTasks();
+            updateStats();
+            showToast('All tasks cleared 🗑️', 'danger');
+        }
+
+        /* ─── RENDER & SAVE ───────────────────────────────── */
+        function renderAllTasks() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+
+            if (!tasks.length) {
+                const empty = document.createElement('div');
+                empty.id = 'empty-state';
+                empty.className = 'empty-state';
+                empty.innerHTML = '<div class="big">📭</div><p>No tasks yet. Add your first task above!</p>';
+                container.append(empty);
+                return;
+            }
+
+            // DocumentFragment for batch DOM insertion
+            const frag = document.createDocumentFragment();
+            tasks.forEach(t => frag.append(buildTaskCard(t)));
+            container.append(frag);                           // append(DocumentFragment)
+        }
+
+        function saveTasks() {
+            localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
+            localStorage.setItem('taskflow-nextid', nextId);
+        }
+
+        /* ════════════════════════════════════════════════════
+           ATTRIBUTES VS PROPERTIES — DEMO
+        ════════════════════════════════════════════════════ */
+        function updateAttrDemo() {
+            const inp = document.getElementById('demo-input');
+
+            /*
+              PROPERTY: inp.value
+              → Live DOM property. Reflects what the user typed right now.
+              → Changes every keystroke.
+            */
+            document.getElementById('prop-out').textContent = inp.value;
+
+            /*
+              ATTRIBUTE: inp.getAttribute('value')
+              → The original HTML attribute. Stays fixed.
+              → Only changes if you call inp.setAttribute('value', ...).
+            */
+            document.getElementById('attr-out').textContent = inp.getAttribute('value');
+        }
+
+        function renderAttrTaskList() {
+            const list = document.getElementById('attr-task-list');
+            list.innerHTML = '';
+            if (!tasks.length) {
+                list.innerHTML = '<p style="color:var(--text-muted);font-size:0.84rem">Add some tasks first to inspect their attributes here.</p>';
+                return;
+            }
+            tasks.slice(0, 5).forEach(task => {
+                const card = document.createElement('div');
+                card.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:JetBrains Mono,monospace;font-size:0.78rem;color:var(--info);';
+                card.textContent =
+                    `data-id="${task.id}"  data-status="${task.status}"  data-category="${task.category}"  ` +
+                    `(title: "${task.title.substring(0, 30)}${task.title.length > 30 ? '…' : ''}")`;
+                list.append(card);
+            });
+        }
+
+        // Attribute API demos
+        function demoGetAttr() {
+            const el = document.querySelector('.task-card') || document.documentElement;
+            const result = el.getAttribute('data-id') || el.getAttribute('data-theme');
+            log('attr-console', `getAttribute('data-id')\n→ "${result}"\n(Returns string or null)`);
+            console.log('getAttribute demo:', result);
+        }
+        function demoSetAttr() {
+            document.documentElement.setAttribute('data-demo', 'active');
+            log('attr-console', `setAttribute('data-demo', 'active')\n→ Set on <html>\n→ document.documentElement.getAttribute('data-demo') === "active"`);
+            console.log('setAttribute demo:', document.documentElement.getAttribute('data-demo'));
+        }
+        function demoRemoveAttr() {
+            document.documentElement.removeAttribute('data-demo');
+            log('attr-console', `removeAttribute('data-demo')\n→ Removed from <html>\n→ hasAttribute('data-demo') now returns false`);
+            console.log('removeAttribute demo: data-demo removed');
+        }
+        function demoHasAttr() {
+            const hasTheme = document.documentElement.hasAttribute('data-theme');
+            log('attr-console', `hasAttribute('data-theme')\n→ ${hasTheme} (data-theme always present)`);
+            console.log('hasAttribute demo:', hasTheme);
+        }
+        function demoDataset() {
+            document.documentElement.dataset.demoDataset = 'hello-dataset';
+            log('attr-console', `dataset.demoDataset = 'hello-dataset'\n→ Sets data-demo-dataset="hello-dataset"\n→ Camel case ↔ kebab-case conversion is automatic`);
+            console.log('dataset demo:', document.documentElement.dataset.demoDataset);
+        }
+        function log(id, msg) {
+            document.getElementById(id).textContent = msg;
+        }
+
+        /* ════════════════════════════════════════════════════
+           EVENT PROPAGATION DEMOS
+        ════════════════════════════════════════════════════ */
+
+        /* ── BUBBLING
+           useCapture = false (default)
+           Fires: Child → Parent → Grandparent
+        ── */
+        const gpBubble = document.getElementById('gp-bubble');
+        const pBubble = document.getElementById('p-bubble');
+        const childBubble = document.getElementById('child-bubble');
+
+        // All three listeners use default (bubbling) — no 3rd arg / false
+        childBubble.addEventListener('click', function (e) {
+            logProp('bubble-log', '👶 Child fired (target)', 'bubble');
+            console.log('[Bubbling] Child');
+        });
+        pBubble.addEventListener('click', function (e) {
+            logProp('bubble-log', '👨 Parent fired (bubbled up)', 'bubble');
+            console.log('[Bubbling] Parent');
+        });
+        gpBubble.addEventListener('click', function (e) {
+            if (e.target === gpBubble) return; // prevent logging when clicking GP directly
+            logProp('bubble-log', '👴 Grandparent fired (bubbled up)', 'bubble');
+            console.log('[Bubbling] Grandparent');
+        });
+
+        /* ── CAPTURING
+           useCapture = true (3rd argument)
+           Fires: Grandparent → Parent → Child
+        ── */
+        const gpCapture = document.getElementById('gp-capture');
+        const pCapture = document.getElementById('p-capture');
+        const childCapture = document.getElementById('child-capture');
+
+        // Pass true as 3rd argument to enable CAPTURING phase
+        gpCapture.addEventListener('click', function (e) {
+            if (e.target === gpCapture) return;
+            logProp('capture-log', '👴 Grandparent fired (capture — outermost first)', 'capture');
+            console.log('[Capturing] Grandparent');
+        }, true);                                                      // ← useCapture = true
+
+        pCapture.addEventListener('click', function (e) {
+            logProp('capture-log', '👨 Parent fired (capture — going down)', 'capture');
+            console.log('[Capturing] Parent');
+        }, true);                                                      // ← useCapture = true
+
+        childCapture.addEventListener('click', function (e) {
+            logProp('capture-log', '👶 Child fired (target — reached destination)', 'capture');
+            console.log('[Capturing] Child');
+        }, true);                                                      // ← useCapture = true
+
+        function logProp(logId, msg, type) {
+            const box = document.getElementById(logId);
+            // Remove placeholder
+            box.querySelectorAll('span[style*="italic"]').forEach(s => s.remove());
+            const entry = document.createElement('div');
+            entry.className = 'log-entry log-' + type;
+            entry.textContent = '→ ' + msg;
+            box.append(entry);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearLog(id) {
+            const box = document.getElementById(id);
+            box.innerHTML = '<span style="color:var(--text-muted);font-style:italic">Log cleared. Click to see events again…</span>';
+        }
+
+        /* ── EVENT DELEGATION DEMO ─────────────────────────── */
+        const fruits = ['Mango', 'Grapes', 'Watermelon', 'Peach', 'Pear', 'Kiwi'];
+        let fi = 0;
+
+        function addDelegationItem() {
+            const list = document.getElementById('delegation-list');
+            const name = fruits[fi % fruits.length]; fi++;
+            const chip = document.createElement('button');
+            chip.className = 'chip active';
+            chip.setAttribute('data-item', name);
+            chip.appendChild(document.createTextNode('🍑 ' + name));
+            list.append(chip);
+        }
+
+        // Single listener on parent — handles all current and future children
+        document.getElementById('delegation-list').addEventListener('click', function (e) {
+            const chip = e.target.closest('[data-item]');
+            if (!chip) return;
+            const item = chip.getAttribute('data-item');    // getAttribute
+            const box = document.getElementById('delegation-log');
+            box.querySelectorAll('span[style*="italic"]').forEach(s => s.remove());
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.color = 'var(--success)';
+            entry.textContent = `→ Clicked "${item}" — caught by parent listener (event.target.dataset.item)`;
+            box.append(entry);
+            box.scrollTop = box.scrollHeight;
+            console.log('[Delegation] Clicked:', item);
+        });
+
+        /* ════════════════════════════════════════════════════
+           TOAST
+        ════════════════════════════════════════════════════ */
+        function showToast(msg, type = 'default') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = msg;
+            container.append(toast);
+            setTimeout(() => toast.remove(), 2800);
+        }
+
+        /* ════════════════════════════════════════════════════
+           INIT
+        ════════════════════════════════════════════════════ */
+        renderAllTasks();
+        updateStats();
+
+        // Keyboard shortcut: Enter to add task
+        document.getElementById('task-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') addTask();
+        });
+    </script>
+</body>
+
+</html>
