@@ -1,0 +1,390 @@
+/* style by claue */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+/* NAV */
+nav {
+    width: 100%;
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1b1b7f;
+    color: white;
+}
+
+.crt-pro {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background-color: transparent;
+    color: white;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.crt-pro:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* PRODUCT GRID */
+.product {
+    width: 100%;
+    min-height: 200px;
+    border-radius: 10px;
+    padding: 16px;
+    background-color: #dde3ea;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* PRODUCT CARD */
+.pro-card {
+    background-color: #ffffff;
+    border: 1px solid #d0d5e0;
+    height: fit-content;
+    width: 250px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(27, 27, 127, 0.1);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.pro-card:hover {
+    box-shadow: 0 6px 18px rgba(27, 27, 127, 0.18);
+    transform: translateY(-2px);
+}
+
+/* CARD IMAGE */
+.card-img {
+    margin-bottom: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #f4f6f8;
+}
+
+.card-img img {
+    object-fit: cover;
+    height: 160px;
+    width: 100%;
+    display: block;
+}
+
+/* CARD TEXT */
+.card-text {
+    margin-bottom: 10px;
+}
+
+.card-text h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+}
+
+.card-text p {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* CARD BUTTONS */
+.btns {
+    display: flex;
+    gap: 8px;
+}
+
+.btns button {
+    flex: 1;
+    border: 2px solid #1b1b7f;
+    padding: 7px 10px;
+    border-radius: 6px;
+    background-color: #eef0fb;
+    color: #1b1b7f;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btns button:hover {
+    background-color: #1b1b7f;
+    color: white;
+}
+
+/* MODAL OVERLAY */
+.form {
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    z-index: 999;
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+    width: 420px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.close-btn h3 {
+    background-color: #e8e8f5;
+    padding: 4px 11px;
+    border-radius: 50%;
+    color: #1b1b7f;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    user-select: none;
+}
+
+.close-btn h3:hover {
+    background-color: #1b1b7f;
+    color: white;
+}
+
+/* FORM */
+form {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: white;
+    padding: 28px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+form input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    font-size: 0.9rem;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+form input:focus {
+    border-color: #1b1b7f;
+    box-shadow: 0 0 0 3px rgba(27, 27, 127, 0.1);
+}
+
+form input::placeholder {
+    color: #aaa;
+}
+
+.form-btn {
+    padding: 11px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    background-color: #1b1b7f;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 4px;
+}
+
+.form-btn:hover {
+    background-color: #14147a;
+}
+
+
+
+/* style by me */
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    background-color: aliceblue;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+}
+
+nav {
+    height: fit-content;
+    width: 100%;
+    border: 2px solid rgb(27, 27, 127);
+    border-radius: 10px;
+    padding: 15px 20px;
+    font-size: large;
+    font-weight: 700;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgb(27, 27, 127);
+    color: white;
+}
+
+.crt-pro {
+    border: none;
+    border: 2px solid rgb(193, 193, 193);
+    background-color: rgb(206, 206, 251);
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.crt-pro:hover {
+    background-color: rgb(86, 86, 252);
+    color: white;
+}
+
+.product {
+    height: 100%;
+    width: 100%;
+    border: 1px solid rgb(198, 198, 241);
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgb(221, 229, 234);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.pro-card {
+    border: 2px solid rgb(145, 144, 144);
+    height: fit-content;
+    width: 250px;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgb(108, 108, 196);
+}
+
+.card-img {
+    margin-bottom: 10px;
+}
+
+.card-img img {
+    object-fit: contain;
+    border: none;
+    height: 50%;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.card-text {
+    margin-bottom: 10px;
+}
+
+.btns button {
+    border: 2px solid rgb(27, 27, 127);
+    padding: 8px;
+    border-radius: 5px;
+    background-color: rgb(200, 200, 228);
+    cursor: pointer;
+}
+
+.btns button:hover {
+    background-color: rgb(131, 131, 197);
+}
+
+.form {
+    background-color: rgba(0, 0, 0, 0.474);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+form {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+form input {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+form button {
+    padding: 10px;
+    font-weight: bold;
+    font-size: medium;
+    border: none;
+    background-color: rgb(61, 61, 145);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: rgb(15, 15, 128);
+}
+
+.close-btn {
+    width: 32%;
+    color: white;
+    display: flex;
+    align-self: self-end;
+    cursor: pointer;
+}
+
+.close-btn h3 {
+    background-color: rgb(226, 226, 240);
+    padding: 5px 10px;
+    border-radius: 50%;
+    color: rgb(15, 15, 128);
+}
+
+.close-btn h3:hover {
+    background-color: rgb(15, 15, 128);
+    color: rgb(226, 226, 240);
+} */
