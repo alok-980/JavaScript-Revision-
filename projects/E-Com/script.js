@@ -4,7 +4,7 @@ let clsBtn = document.querySelector(".close-btn")
 let form = document.querySelector("form")
 let productDiv = document.querySelector(".product")
 
-let productList = []
+let productList = JSON.parse(localStorage.getItem("products")) || []
 
 let updateIdx = null;
 let deleteIdx = null;
@@ -69,8 +69,10 @@ form.addEventListener("submit", (event) => {
     if(updateIdx !== null) {
         productList[updateIdx] = productObj
         updateIdx = null
+        localStorage.setItem("products", JSON.stringify(productList))
     } else {
         productList.push(productObj)
+        localStorage.setItem("products", JSON.stringify(productList))
     }
 
     viewList()
@@ -99,6 +101,8 @@ const deleteProduct = (productId) => {
     deleteIdx = productList.findIndex((ele) => ele.id == productId)
 
     productList.splice(deleteIdx, 1)
+
+    localStorage.setItem("products", JSON.stringify(productList))
 
     deleteIdx = null
 

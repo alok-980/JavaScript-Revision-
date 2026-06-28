@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+/* button {
+    height: 20px;
+    width: 50px;
+    cursor: pointer;
+} */
+
+#students {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.card {
+    border: 2px solid black;
+    border-radius: 5px;
+    height: fit-content;
+    width: 80px;
+    padding: 5px;
+}
